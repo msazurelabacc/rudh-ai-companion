@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Azure & Secrets
+.env
+.env.local
+.env.production
+*.key
+*.pem
+secrets/
+azure-credentials.json
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+C:\RudhDev\Logs\*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Dependencies
+node_modules/
+venv/
+env/
+
+# Azure/Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
+terraform.tfvars
