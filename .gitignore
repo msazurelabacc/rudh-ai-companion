@@ -23,43 +23,57 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Azure & Secrets
+# Virtual environments
 .env
-.env.local
-.env.production
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Azure & Secrets
+.azure/
 *.key
 *.pem
-secrets/
-azure-credentials.json
+.env.local
+.env.production
+config/secrets.json
+src/config/azure_secrets.py
 
-# IDEs
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
+# Logs
+*.log
+logs/
+C:/RudhDev/Logs/
+
 # OS
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
-logs/
-C:\RudhDev\Logs\*
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# pytest
+.pytest_cache/
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
 
 # Temporary files
-tmp/
-temp/
 *.tmp
-
-# Dependencies
-node_modules/
-venv/
-env/
-
-# Azure/Terraform
-*.tfstate
-*.tfstate.backup
-.terraform/
-terraform.tfvars
+*.temp
+temp/
+tmp/
