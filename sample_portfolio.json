@@ -1,0 +1,50 @@
+{
+  "portfolio_name": "Sample Chennai Tech Portfolio",
+  "created_date": "2025-08-19",
+  "currency": "INR",
+  "risk_tolerance": "MEDIUM",
+  "holdings": [
+    {
+      "symbol": "TCS",
+      "name": "Tata Consultancy Services",
+      "quantity": 10,
+      "avg_purchase_price": 3800.0,
+      "purchase_date": "2024-12-01",
+      "sector": "IT Services"
+    },
+    {
+      "symbol": "RELIANCE",
+      "name": "Reliance Industries",
+      "quantity": 5,
+      "avg_purchase_price": 2500.0,
+      "purchase_date": "2024-11-15",
+      "sector": "Oil & Gas"
+    },
+    {
+      "symbol": "INFY",
+      "name": "Infosys Limited",
+      "quantity": 15,
+      "avg_purchase_price": 1600.0,
+      "purchase_date": "2024-10-20",
+      "sector": "IT Services"
+    },
+    {
+      "symbol": "HDFCBANK",
+      "name": "HDFC Bank",
+      "quantity": 8,
+      "avg_purchase_price": 1700.0,
+      "purchase_date": "2024-09-10",
+      "sector": "Banking"
+    }
+  ],
+  "watchlist": [
+    "ICICIBANK",
+    "SBI",
+    "ITC",
+    "LT",
+    "WIPRO",
+    "MARUTI",
+    "BHARTIARTL",
+    "ASIANPAINT"
+  ]
+}
