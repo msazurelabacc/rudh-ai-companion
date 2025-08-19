@@ -1,7 +1,7 @@
-# rudh_financial_advisor_v31.py
+# rudh_financial_advisor_v31_fixed.py
 """
-Rudh Financial Advisor V3.1 - Advanced Financial Intelligence
-Enhanced with technical indicators, Chennai market intelligence, and sophisticated analysis
+Rudh Financial Advisor V3.1 - COMPLETE FIXED VERSION
+Enhanced with technical indicators, Chennai market intelligence, and working voice
 """
 import asyncio
 import logging
@@ -48,6 +48,18 @@ class EnhancedRudhFinancialAdvisor:
         self.speech_service = AzureSpeechService()
         
         self.logger.info("✅ Enhanced Rudh Financial Advisor V3.1 initialized")
+    
+    async def speak_response(self, text: str):
+        """Generate speech for response if voice enabled"""
+        if self.voice_enabled and self.speech_service:
+            try:
+                start_time = time.time()
+                # Use synthesize_speech method
+                await self.speech_service.synthesize_speech(text)
+                speech_time = time.time() - start_time
+                print(f"✅ Speech completed ({speech_time:.3f}s)")
+            except Exception as e:
+                self.logger.warning(f"Speech synthesis failed: {e}")
     
     async def analyze_stock_advanced(self, symbol: str) -> str:
         """Enhanced stock analysis with technical indicators"""
@@ -389,29 +401,6 @@ Keep response conversational and helpful."""
 🚀 May your investments grow and prosper!
 
 📈 Keep building wealth with intelligent decisions."""
-    
-async def speak_response(self, text: str):
-    """Generate speech for response if voice enabled"""
-    if self.voice_enabled and self.speech_service:
-        try:
-            start_time = time.time()
-            # Check available methods and use the correct one
-            if hasattr(self.speech_service, 'synthesize_speech'):
-                await self.speech_service.synthesize_speech(text)
-            elif hasattr(self.speech_service, 'speak'):
-                await self.speech_service.speak(text)
-            elif hasattr(self.speech_service, 'text_to_speech'):
-                await self.speech_service.text_to_speech(text)
-            else:
-                # List available methods for debugging
-                methods = [m for m in dir(self.speech_service) if not m.startswith('_') and callable(getattr(self.speech_service, m))]
-                print(f"Available speech methods: {methods}")
-                return
-            
-            speech_time = time.time() - start_time
-            print(f"✅ Speech completed ({speech_time:.3f}s)")
-        except Exception as e:
-            self.logger.warning(f"Speech synthesis failed: {e}")
 
 async def main():
     """Main interactive loop for Enhanced Rudh Financial Advisor"""
