@@ -1,440 +1,680 @@
-# src\rudh_core\core.py
 """
-Rudh AI Core - Compatible with Enhanced Emotion Detection Engine
-Phase 2.1: Integration with 15+ emotion types and advanced confidence scoring
+Enhanced Rudh Core - Phase 2.2 COMPLETE
+Integrated emotion detection and advanced context awareness
 """
 
 import asyncio
+import time
 import logging
-import sys
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
-import re
-import json
+from typing import Dict, List, Optional, Any
+from dataclasses import asdict
 
-# Import the enhanced emotion engine
-from .emotion_engine import EnhancedEmotionEngine, EmotionResult
+# Import our enhanced engines
+from .emotion_engine import EnhancedEmotionEngine
+from .context_engine import AdvancedContextEngine
 
-class RudhCore:
+class EnhancedRudhCore:
     """
-    Enhanced Rudh AI Core with advanced emotion detection
-    Phase 2.1: Upgraded emotional intelligence and response strategies
+    Enhanced Rudh AI Core with advanced emotion detection and context awareness
+    Phase 2.2: Context-aware response generation
     """
     
-    def __init__(self):
-        """Initialize Rudh with enhanced capabilities"""
-        self.setup_logging()
+    def __init__(self, config: Optional[Dict] = None):
+        """Initialize enhanced Rudh core with emotion and context engines"""
+        self.config = config or {}
+        
+        # Initialize logging
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
         self.logger = logging.getLogger(__name__)
         
-        # Initialize enhanced emotion engine
+        # Initialize AI engines
         self.emotion_engine = EnhancedEmotionEngine()
+        self.context_engine = AdvancedContextEngine()
         
-        # Enhanced response strategies with emotion-specific handling
-        self.response_strategies = {
-            'emotional_support': {
-                'triggers': ['joyful', 'sad', 'anxious', 'angry', 'fearful', 'lonely', 'guilty', 'disappointed'],
-                'confidence_threshold': 0.3,
-                'description': 'Providing empathetic emotional support and guidance'
-            },
-            'financial_advisor': {
-                'triggers': ['investment', 'money', 'stock', 'financial', 'budget', 'wealth', 'advice', 'portfolio'],
-                'confidence_threshold': 0.4,
-                'description': 'Expert financial and investment guidance'
-            },
-            'creative_assistant': {
-                'triggers': ['design', 'create', 'build', 'plan', 'develop', 'idea', 'project', 'creative'],
-                'confidence_threshold': 0.4,
-                'description': 'Creative problem-solving and design assistance'
-            },
-            'knowledge_sharing': {
-                'triggers': ['what', 'how', 'why', 'explain', 'tell', 'learn', 'understand', 'know'],
-                'confidence_threshold': 0.3,
-                'description': 'Educational content and knowledge sharing'
-            },
-            'gratitude_response': {
-                'triggers': ['grateful', 'surprised'],
-                'confidence_threshold': 0.3,
-                'description': 'Responding to gratitude and positive interactions'
-            },
-            'confusion_clarification': {
-                'triggers': ['confused', 'unclear'],
-                'confidence_threshold': 0.4,
-                'description': 'Helping clarify confusing or unclear topics'
-            },
-            'celebration': {
-                'triggers': ['excited', 'proud', 'hopeful'],
-                'confidence_threshold': 0.4,
-                'description': 'Celebrating achievements and positive moments'
-            }
-        }
-        
-        # Enhanced conversation memory with emotion tracking
-        self.conversation_memory = []
-        self.emotion_history = []
-        self.max_memory_size = 100
-        
-        # Performance metrics
-        self.stats = {
-            'total_conversations': 0,
+        # Conversation management
+        self.conversation_history = []
+        self.session_stats = {
+            'messages_processed': 0,
+            'total_processing_time': 0,
+            'average_confidence': 0,
             'emotions_detected': {},
+            'topics_discussed': {},
             'strategies_used': {},
-            'average_confidence': 0.0,
             'session_start': datetime.now()
         }
         
-        # Tamil responses with emotional context
-        self.tamil_responses = {
-            'joyful': [
-                "மகிழ்ச்சி! உங்கள் சந்தோசம் என்னையும் மகிழ்வடையச் செய்கிறது! 🌟",
-                "அருமை! உங்கள் மகிழ்ச்சியைப் பகிர்ந்துகொண்டதற்கு நன்றி!"
-            ],
-            'sad': [
-                "வருத்தமாக இருக்கிறீர்களா? நான் உங்களுக்கு ஆறுதல் தர இருக்கிறேன். 💙",
-                "கவலையில்லை, எல்லாம் சரியாகும். நான் உங்களுடன் இருக்கிறேன்."
-            ],
-            'anxious': [
-                "கவலைப்படாதீர்கள். மூச்சு விடுங்கள். நான் உங்களுக்கு உதவுகிறேன். 🌸",
-                "பதட்டம் இயல்பானது. ஒன்றும் பயப்படவேண்டாம்."
-            ],
-            'grateful': [
-                "நன்றி! உங்கள் நன்றியுணர்வு என் மனதைத் தொடுகிறது! 🙏",
-                "வரவேற்கிறேன்! எப்போதும் உதவ தயாராக இருக்கிறேன்."
-            ],
-            'general': [
-                "வணக்கம்! எப்படி உதவ முடியும்?",
-                "சொல்லுங்கள், என்ன உதவி வேண்டும்?"
-            ]
+        # Response templates enhanced with context awareness
+        self.response_templates = {
+            'supportive': {
+                'casual': [
+                    "I can really understand how {emotion} you must be feeling about {topic}. {empathy_response}",
+                    "That sounds {intensity} {emotion}. {validation} {support_offer}",
+                    "I hear you - dealing with {topic} can be really {emotion}. {encouragement}"
+                ],
+                'professional': [
+                    "I understand this {topic} situation is causing you to feel {emotion}. {professional_support}",
+                    "Your {emotion} feelings about {topic} are completely valid. {structured_support}",
+                    "I recognize the {intensity} {emotion} you're experiencing with {topic}. {professional_guidance}"
+                ],
+                'formal': [
+                    "I acknowledge your {emotion} feelings regarding {topic}. {formal_support}",
+                    "Your emotional response to {topic} is understandable. {formal_guidance}",
+                    "I recognize the significance of your {emotion} experience with {topic}. {formal_assistance}"
+                ]
+            },
+            'analytical': {
+                'casual': [
+                    "Let's break down this {topic} situation. {analysis_intro} {logical_steps}",
+                    "Looking at your {topic} challenge, here's what I'm thinking: {analytical_response}",
+                    "So with {topic}, we've got a few things to consider: {options_list}"
+                ],
+                'professional': [
+                    "Analyzing your {topic} situation, I can identify several key factors: {professional_analysis}",
+                    "From a strategic perspective on {topic}: {structured_analysis}",
+                    "Considering the {topic} context, here's my assessment: {professional_breakdown}"
+                ],
+                'formal': [
+                    "Upon analysis of your {topic} inquiry, the following considerations emerge: {formal_analysis}",
+                    "A systematic evaluation of {topic} reveals: {formal_assessment}",
+                    "The {topic} situation presents these analytical points: {formal_breakdown}"
+                ]
+            },
+            'educational': {
+                'casual': [
+                    "Great question about {topic}! Let me explain it this way: {simple_explanation}",
+                    "So you want to learn about {topic}? Here's the deal: {engaging_explanation}",
+                    "I love that you're curious about {topic}! {enthusiastic_teaching}"
+                ],
+                'professional': [
+                    "I'm happy to explain {topic}. {professional_introduction} {structured_explanation}",
+                    "Regarding your question about {topic}: {professional_teaching}",
+                    "To help you understand {topic} better: {comprehensive_explanation}"
+                ],
+                'formal': [
+                    "In response to your inquiry about {topic}: {formal_explanation}",
+                    "To provide clarity on {topic}: {academic_explanation}",
+                    "Regarding the {topic} concept you've asked about: {formal_teaching}"
+                ]
+            },
+            'motivational': {
+                'casual': [
+                    "You've got this! {topic} might seem tough, but {encouragement} {action_steps}",
+                    "I believe in you with {topic}! {motivation} {next_steps}",
+                    "Let's make {topic} happen! {energy} {goal_alignment}"
+                ],
+                'professional': [
+                    "You have the capability to succeed with {topic}. {professional_motivation} {strategic_steps}",
+                    "Your goals regarding {topic} are achievable. {structured_encouragement} {action_plan}",
+                    "Success in {topic} is within your reach. {professional_empowerment} {guidance}"
+                ],
+                'formal': [
+                    "Your objectives concerning {topic} are attainable. {formal_encouragement} {structured_approach}",
+                    "Achievement in {topic} is certainly possible. {formal_motivation} {systematic_guidance}",
+                    "Your aspirations regarding {topic} can be realized. {formal_empowerment} {methodical_steps}"
+                ]
+            },
+            'conversational': {
+                'casual': [
+                    "That's interesting about {topic}! {conversational_response} {follow_up_question}",
+                    "Oh, {topic}! {relatable_response} {engaging_continuation}",
+                    "I find {topic} fascinating too! {shared_interest} {exploration}"
+                ],
+                'professional': [
+                    "Thank you for sharing about {topic}. {professional_engagement} {thoughtful_response}",
+                    "Your perspective on {topic} is valuable. {professional_conversation} {meaningful_exchange}",
+                    "I appreciate your thoughts on {topic}. {professional_dialogue} {continued_discussion}"
+                ],
+                'formal': [
+                    "Your observations regarding {topic} are noteworthy. {formal_acknowledgment} {respectful_dialogue}",
+                    "I find your perspective on {topic} quite insightful. {formal_engagement} {scholarly_discussion}",
+                    "Your viewpoint concerning {topic} merits consideration. {formal_conversation} {intellectual_exchange}"
+                ]
+            }
         }
         
-        self.logger.info("✅ Rudh Core Enhanced Edition initialized successfully")
-        self.logger.info(f"🧠 Emotion Engine: {len(self.emotion_engine.get_supported_emotions())} emotions supported")
-
-    def setup_logging(self):
-        """Setup enhanced logging configuration"""
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.StreamHandler(sys.stdout)
-            ]
-        )
-
-    async def process_message(self, user_input: str, context: Optional[Dict] = None) -> Dict:
-        """
-        Enhanced message processing with advanced emotion detection
+        # Context-specific response elements
+        self.response_elements = {
+            'empathy_response': {
+                'high_emotion': "That must be really overwhelming for you.",
+                'medium_emotion': "I can imagine that's quite challenging.",
+                'low_emotion': "That sounds like something worth talking about."
+            },
+            'validation': {
+                'work': "Work stress is incredibly common and your feelings are completely valid.",
+                'relationships': "Relationship challenges affect us deeply, and it's natural to feel this way.",
+                'health': "Health concerns can be very worrying, and your feelings make complete sense.",
+                'finance': "Financial matters can be really stressful, and your concerns are understandable."
+            },
+            'support_offer': {
+                'high_urgency': "What would be most helpful for you right now?",
+                'medium_urgency': "How can I best support you through this?",
+                'low_urgency': "I'm here to help you work through this when you're ready."
+            },
+            'encouragement': {
+                'general': "You're not alone in this, and there are ways to move forward.",
+                'specific': "Your awareness of this situation is already a positive step forward."
+            }
+        }
         
-        Args:
-            user_input: User's message
-            context: Optional conversation context
-            
-        Returns:
-            Comprehensive response package with emotion analysis
+        self.logger.info("Enhanced Rudh Core initialized with emotion and context engines")
+    
+    async def process_message(self, user_input: str, user_context: Optional[Dict] = None) -> Dict[str, Any]:
         """
+        Process user message with enhanced emotion detection and context awareness
+        """
+        start_time = time.time()
+        
         try:
-            start_time = datetime.now()
+            # Phase 1: Emotion Analysis
+            emotion_start = time.time()
+            emotion_result = await self.emotion_engine.analyze_emotion(user_input)
+            emotion_time = time.time() - emotion_start
             
-            # Detect emotions using enhanced engine
-            emotion_result = self.emotion_engine.detect_emotion(user_input, context)
-            
-            # Detect language
-            language = self._detect_language(user_input)
-            
-            # Select response strategy based on emotion and content
-            strategy, strategy_confidence = self._select_strategy(user_input, emotion_result)
-            
-            # Generate response
-            response = await self._generate_response(
-                user_input, emotion_result, strategy, language
+            # Phase 2: Context Analysis  
+            context_start = time.time()
+            conversation_context = self.context_engine.analyze_context(
+                user_input, 
+                emotion_result, 
+                self.conversation_history[-10:]  # Last 10 messages for context
             )
+            context_time = time.time() - context_start
             
-            # Update statistics
-            self._update_statistics(emotion_result, strategy)
+            # Phase 3: Response Strategy Generation
+            strategy_start = time.time()
+            response_strategy = self.context_engine.generate_response_strategy(
+                conversation_context, 
+                emotion_result
+            )
+            strategy_time = time.time() - strategy_start
             
-            # Store in memory
-            self._store_conversation(user_input, response, emotion_result, strategy)
+            # Phase 4: Enhanced Response Generation
+            response_start = time.time()
+            response_content = await self._generate_contextual_response(
+                user_input, 
+                emotion_result, 
+                conversation_context, 
+                response_strategy
+            )
+            response_time = time.time() - response_start
             
-            # Calculate processing time
-            processing_time = (datetime.now() - start_time).total_seconds()
+            # Phase 5: Update User Profile and Memory
+            memory_start = time.time()
+            self.context_engine.update_user_profile(user_input, conversation_context)
+            self._update_conversation_memory(user_input, emotion_result, conversation_context, response_content)
+            memory_time = time.time() - memory_start
             
-            # Create comprehensive response package
-            response_package = {
-                'response': response,
+            # Calculate total processing time
+            total_time = time.time() - start_time
+            
+            # Update session statistics
+            self._update_session_stats(emotion_result, conversation_context, response_strategy, total_time)
+            
+            # Prepare comprehensive response
+            enhanced_response = {
+                'response': response_content,
                 'emotion_analysis': {
-                    'primary_emotion': emotion_result.primary_emotion,
-                    'confidence': emotion_result.confidence,
-                    'intensity': emotion_result.emotional_intensity,
-                    'secondary_emotions': emotion_result.secondary_emotions,
-                    'context': emotion_result.context_keywords,
-                    'summary': self.emotion_engine.get_emotion_summary(emotion_result)
+                    'primary_emotion': emotion_result.get('primary_emotion', 'neutral'),
+                    'confidence': emotion_result.get('confidence', 0.0),
+                    'intensity': emotion_result.get('intensity', 'medium'),
+                    'secondary_emotions': emotion_result.get('secondary_emotions', []),
+                    'processing_time': f"{emotion_time:.3f}s"
                 },
-                'strategy': {
-                    'selected': strategy,
-                    'confidence': strategy_confidence,
-                    'description': self.response_strategies[strategy]['description']
+                'context_analysis': {
+                    'topic': conversation_context.topic,
+                    'conversation_stage': conversation_context.conversation_stage,
+                    'user_goals': conversation_context.user_goals,
+                    'urgency_level': conversation_context.urgency_level,
+                    'formality_level': conversation_context.formality_level,
+                    'key_entities': conversation_context.key_entities,
+                    'mood_trend': conversation_context.user_mood_trend,
+                    'processing_time': f"{context_time:.3f}s"
                 },
-                'language': language,
-                'processing_time': processing_time,
-                'conversation_count': len(self.conversation_memory),
-                'timestamp': datetime.now().isoformat()
+                'response_strategy': {
+                    'strategy_type': response_strategy.strategy_type,
+                    'confidence': response_strategy.confidence,
+                    'reasoning': response_strategy.reasoning,
+                    'content_focus': response_strategy.content_focus,
+                    'follow_up_suggestions': response_strategy.follow_up_suggestions,
+                    'processing_time': f"{strategy_time:.3f}s"
+                },
+                'performance_metrics': {
+                    'total_processing_time': f"{total_time:.3f}s",
+                    'emotion_processing': f"{emotion_time:.3f}s",
+                    'context_processing': f"{context_time:.3f}s",
+                    'strategy_processing': f"{strategy_time:.3f}s",
+                    'response_generation': f"{response_time:.3f}s",
+                    'memory_update': f"{memory_time:.3f}s"
+                },
+                'session_info': {
+                    'message_count': self.session_stats['messages_processed'],
+                    'session_duration': str(datetime.now() - self.session_stats['session_start']).split('.')[0],
+                    'average_confidence': f"{self.session_stats['average_confidence']:.1f}%"
+                }
             }
             
-            self.logger.info(f"✅ Message processed: {emotion_result.primary_emotion} emotion, {strategy} strategy")
-            
-            return response_package
+            self.logger.info(f"Message processed successfully in {total_time:.3f}s")
+            return enhanced_response
             
         except Exception as e:
-            self.logger.error(f"❌ Error processing message: {str(e)}")
-            return self._create_error_response(str(e))
-
-    def _select_strategy(self, user_input: str, emotion_result: EmotionResult) -> Tuple[str, float]:
-        """
-        Enhanced strategy selection based on emotion and content analysis
-        """
-        strategy_scores = {}
-        text_lower = user_input.lower()
-        
-        # Check emotion-based triggers first (higher priority)
-        for strategy, config in self.response_strategies.items():
-            score = 0.0
-            
-            # Check if primary emotion triggers this strategy
-            if emotion_result.primary_emotion in config['triggers']:
-                score += 0.6 * emotion_result.confidence
-            
-            # Check if secondary emotions trigger this strategy
-            for secondary_emotion, secondary_confidence in emotion_result.secondary_emotions:
-                if secondary_emotion in config['triggers']:
-                    score += 0.3 * secondary_confidence
-            
-            # Check keyword triggers
-            keyword_matches = sum(1 for trigger in config['triggers'] 
-                                if trigger in text_lower and trigger not in self.emotion_engine.get_supported_emotions())
-            if keyword_matches > 0:
-                score += 0.4 * (keyword_matches / len(config['triggers']))
-            
-            # Context boost
-            for context in emotion_result.context_keywords:
-                if context in ['work', 'money', 'financial'] and strategy == 'financial_advisor':
-                    score += 0.2
-                elif context in ['personal', 'family'] and strategy == 'emotional_support':
-                    score += 0.2
-            
-            if score >= config['confidence_threshold']:
-                strategy_scores[strategy] = score
-        
-        # Select strategy with highest score
-        if strategy_scores:
-            best_strategy = max(strategy_scores.items(), key=lambda x: x[1])
-            return best_strategy[0], best_strategy[1]
-        else:
-            # Fallback to knowledge sharing
-            return 'knowledge_sharing', 0.5
-
-    async def _generate_response(self, user_input: str, emotion_result: EmotionResult, 
-                               strategy: str, language: str) -> str:
-        """Enhanced response generation with emotion-aware responses"""
-        primary_emotion = emotion_result.primary_emotion
-        intensity = emotion_result.emotional_intensity
-        
-        # Tamil language responses
-        if language == 'tamil':
-            if primary_emotion in self.tamil_responses:
-                return self.tamil_responses[primary_emotion][0]
-            else:
-                return self.tamil_responses['general'][0]
-        
-        # English responses based on strategy and emotion
-        if strategy == 'emotional_support':
-            return self._generate_emotional_support_response(emotion_result, user_input)
-        elif strategy == 'financial_advisor':
-            return self._generate_financial_advice_response(emotion_result, user_input)
-        elif strategy == 'creative_assistant':
-            return self._generate_creative_response(emotion_result, user_input)
-        elif strategy == 'gratitude_response':
-            return self._generate_gratitude_response(emotion_result, user_input)
-        elif strategy == 'confusion_clarification':
-            return self._generate_clarification_response(emotion_result, user_input)
-        elif strategy == 'celebration':
-            return self._generate_celebration_response(emotion_result, user_input)
-        else:  # knowledge_sharing
-            return self._generate_knowledge_response(emotion_result, user_input)
-
-    def _generate_emotional_support_response(self, emotion_result: EmotionResult, user_input: str) -> str:
-        """Generate empathetic emotional support responses"""
-        emotion = emotion_result.primary_emotion
-        intensity = emotion_result.emotional_intensity
-        
-        responses = {
-            'sad': {
-                'high': "I can sense you're going through a really difficult time right now. Your feelings are completely valid, and it's okay to feel this way. Remember that difficult emotions are temporary, and you have the strength to get through this. I'm here to support you. Would you like to talk about what's causing these feelings?",
-                'medium': "I hear that you're feeling sad. It's natural to have these emotions sometimes. Take a moment to breathe and be gentle with yourself. What's one small thing that usually brings you a bit of comfort?",
-                'low': "I notice you're feeling a bit down. That's completely normal - we all have those moments. Is there anything specific on your mind that you'd like to share?"
-            },
-            'anxious': {
-                'high': "I can feel the anxiety in your words, and I want you to know that what you're experiencing is real and valid. Let's take this one step at a time. First, try taking three deep breaths with me. Anxiety can feel overwhelming, but you're stronger than you know. What's the main thing that's worrying you right now?",
-                'medium': "It sounds like you're feeling stressed about something. Anxiety can be challenging, but remember that you've handled difficult situations before. What's one thing you can control in this situation?",
-                'low': "I sense some worry in your message. Sometimes talking through our concerns can help put things in perspective. What's on your mind?"
-            },
-            'angry': {
-                'high': "I can hear the frustration and anger in your words. These feelings are completely understandable - something has clearly upset you deeply. It's okay to feel angry; your emotions are valid. When you're ready, would you like to talk through what happened?",
-                'medium': "It sounds like something has really frustrated you. Anger often signals that something important to us has been affected. What's the situation that's bothering you?",
-                'low': "I sense some irritation in your message. Sometimes it helps to express what's bothering us. Would you like to share what's on your mind?"
+            self.logger.error(f"Error processing message: {str(e)}")
+            return {
+                'response': "I apologize, but I encountered an error processing your message. Please try again.",
+                'error': str(e),
+                'processing_time': f"{time.time() - start_time:.3f}s"
             }
-        }
+    
+    async def _generate_contextual_response(self, user_input: str, emotion_result: Dict,
+                                          conversation_context, response_strategy) -> str:
+        """
+        Generate contextually appropriate response using templates and strategies
+        """
+        try:
+            # Get base template based on strategy and formality
+            strategy_type = response_strategy.strategy_type
+            formality = conversation_context.formality_level
+            
+            templates = self.response_templates.get(strategy_type, {}).get(formality, [])
+            if not templates:
+                templates = self.response_templates['conversational']['casual']
+            
+            # Select template based on context
+            template = self._select_best_template(templates, conversation_context, emotion_result)
+            
+            # Prepare template variables
+            template_vars = {
+                'emotion': emotion_result.get('primary_emotion', 'uncertain'),
+                'intensity': emotion_result.get('intensity', 'medium'),
+                'topic': conversation_context.topic,
+                'urgency': conversation_context.urgency_level
+            }
+            
+            # Add context-specific response elements
+            template_vars.update(self._get_response_elements(conversation_context, emotion_result))
+            
+            # Format template with variables
+            try:
+                formatted_response = template.format(**template_vars)
+            except KeyError as e:
+                # Fallback if template formatting fails
+                self.logger.warning(f"Template formatting failed: {e}")
+                formatted_response = self._generate_fallback_response(conversation_context, emotion_result)
+            
+            # Add strategy-specific enhancements
+            enhanced_response = self._enhance_response_with_strategy(
+                formatted_response, response_strategy, conversation_context
+            )
+            
+            # Add follow-up suggestions if appropriate
+            if response_strategy.follow_up_suggestions and len(response_strategy.follow_up_suggestions) > 0:
+                follow_up = response_strategy.follow_up_suggestions[0]  # Use first suggestion
+                enhanced_response += f"\n\n{follow_up}"
+            
+            return enhanced_response
+            
+        except Exception as e:
+            self.logger.error(f"Error generating contextual response: {e}")
+            return self._generate_fallback_response(conversation_context, emotion_result)
+    
+    def _select_best_template(self, templates: List[str], context, emotion_result: Dict) -> str:
+        """Select the most appropriate template based on context"""
+        if not templates:
+            return "I understand you're feeling {emotion} about {topic}. How can I help you with this?"
         
-        if emotion in responses and intensity in responses[emotion]:
-            return responses[emotion][intensity]
+        # For now, select based on conversation stage
+        if context.conversation_stage == 'opening':
+            return templates[0] if len(templates) > 0 else templates[0]
+        elif context.conversation_stage == 'deep_dive':
+            return templates[-1] if len(templates) > 1 else templates[0]
         else:
-            return f"I can sense you're experiencing {emotion} feelings. Your emotions are valid, and I'm here to support you. Would you like to share more about what you're going through?"
-
-    def _generate_financial_advice_response(self, emotion_result: EmotionResult, user_input: str) -> str:
-        """Generate financial advice responses"""
-        base_response = "I'd be happy to help with financial insights! "
+            return templates[len(templates)//2] if len(templates) > 2 else templates[0]
+    
+    def _get_response_elements(self, context, emotion_result: Dict) -> Dict[str, str]:
+        """Get context-specific response elements"""
+        elements = {}
         
-        if 'anxious' in [emotion_result.primary_emotion] + [e[0] for e in emotion_result.secondary_emotions]:
-            return base_response + "I understand financial decisions can feel stressful. Let's break this down step by step to make it more manageable. What specific area of finance are you most concerned about - investments, budgeting, savings, or something else?"
+        # Empathy response based on emotion intensity
+        intensity = emotion_result.get('intensity', 'medium')
+        empathy_key = f"{intensity}_emotion"
+        elements['empathy_response'] = self.response_elements['empathy_response'].get(
+            empathy_key, self.response_elements['empathy_response']['medium_emotion']
+        )
         
-        return base_response + "I can assist with investment strategies, market analysis, portfolio planning, wealth building, and risk assessment. What specific financial area interests you most?"
-
-    def _generate_creative_response(self, emotion_result: EmotionResult, user_input: str) -> str:
-        """Generate creative assistance responses"""
-        if emotion_result.primary_emotion == 'excited':
-            return "I love your enthusiasm for this creative project! That energy will fuel great results. Let's channel that excitement into something amazing. What kind of design or creative project are you working on?"
+        # Validation based on topic
+        elements['validation'] = self.response_elements['validation'].get(
+            context.topic, "Your feelings about this are completely understandable."
+        )
         
-        return "I'm excited to help with your creative project! Whether it's design, planning, problem-solving, or brainstorming, I'm here to assist. What are you looking to create or develop?"
-
-    def _generate_gratitude_response(self, emotion_result: EmotionResult, user_input: str) -> str:
-        """Generate responses to gratitude"""
-        return "You're very welcome! Your gratitude truly brightens my day. I'm always here to help whenever you need assistance. Is there anything else I can support you with?"
-
-    def _generate_clarification_response(self, emotion_result: EmotionResult, user_input: str) -> str:
-        """Generate clarification responses for confusion"""
-        return "I can see this topic is causing some confusion, and that's completely understandable! I'm here to help clarify things. Let me break this down in a way that makes sense. What specific part would you like me to explain more clearly?"
-
-    def _generate_celebration_response(self, emotion_result: EmotionResult, user_input: str) -> str:
-        """Generate celebratory responses for positive emotions"""
-        emotion = emotion_result.primary_emotion
+        # Support offer based on urgency
+        urgency_key = f"{context.urgency_level}_urgency"
+        elements['support_offer'] = self.response_elements['support_offer'].get(
+            urgency_key, self.response_elements['support_offer']['medium_urgency']
+        )
         
-        if emotion == 'excited':
-            return "Your excitement is contagious! I can feel your positive energy. This sounds like something wonderful is happening. Tell me more about what has you so thrilled!"
+        # Encouragement
+        elements['encouragement'] = self.response_elements['encouragement']['general']
         
-        if emotion == 'proud':
-            return "You should absolutely feel proud! Achievement and personal growth deserve to be celebrated. Your hard work has paid off. What accomplishment are you most proud of?"
+        # ADD ALL MISSING TEMPLATE ELEMENTS:
         
-        return "I can sense your positive energy, and it's wonderful! Celebrating good moments is so important. What's bringing you joy today?"
-
-    def _generate_knowledge_response(self, emotion_result: EmotionResult, user_input: str) -> str:
-        """Generate knowledge-sharing responses"""
-        return "I'm here to share knowledge and help you understand whatever you're curious about! Learning is one of life's greatest adventures. What topic interests you today?"
-
-    def _detect_language(self, text: str) -> str:
-        """Enhanced language detection with better Tamil recognition"""
-        tamil_patterns = [
-            r'[\u0B80-\u0BFF]',  # Tamil Unicode range
-            r'\b(வணக்கம்|நன்றி|எப்படி|என்ன|எங்கள்|உங்கள்|நான்|அது|இது|அவர்|இவர்)\b'
-        ]
+        # Analysis elements
+        elements['analysis_intro'] = "Looking at this situation,"
+        elements['logical_steps'] = "here are the key factors to consider."
+        elements['analytical_response'] = "I can help you analyze this systematically."
+        elements['options_list'] = "Let's explore your available options."
+        elements['pros_cons'] = "We can weigh the advantages and disadvantages."
+        elements['step_by_step'] = "I'll break this down step by step."
         
-        for pattern in tamil_patterns:
-            if re.search(pattern, text):
-                return 'tamil'
+        # Professional analysis elements
+        elements['professional_analysis'] = "From a strategic perspective, here's my assessment."
+        elements['structured_analysis'] = "Let me provide a systematic evaluation."
+        elements['professional_breakdown'] = "Here's a comprehensive analysis."
+        elements['professional_assessment'] = "My professional evaluation suggests:"
+        elements['structured_support'] = "Let me provide structured support for this."
+        elements['professional_guidance'] = "Here's my professional guidance on this matter."
         
-        return 'english'
-
-    def _update_statistics(self, emotion_result: EmotionResult, strategy: str):
-        """Update enhanced statistics tracking"""
-        self.stats['total_conversations'] += 1
+        # Formal analysis elements  
+        elements['formal_analysis'] = "Upon careful consideration, the following points emerge."
+        elements['formal_assessment'] = "A thorough evaluation reveals:"
+        elements['formal_breakdown'] = "The systematic analysis indicates:"
+        elements['formal_support'] = "I offer my formal support in this matter."
+        elements['formal_guidance'] = "Allow me to provide formal guidance."
+        elements['formal_assistance'] = "I shall provide formal assistance."
         
-        # Track emotion frequency
-        emotion = emotion_result.primary_emotion
-        if emotion not in self.stats['emotions_detected']:
-            self.stats['emotions_detected'][emotion] = 0
-        self.stats['emotions_detected'][emotion] += 1
+        # Educational elements
+        elements['simple_explanation'] = "Let me explain this clearly."
+        elements['engaging_explanation'] = "Here's how this works."
+        elements['enthusiastic_teaching'] = "I'm excited to help you learn this!"
+        elements['professional_introduction'] = "To help you understand this better:"
+        elements['structured_explanation'] = "Let me break this down systematically."
+        elements['professional_teaching'] = "Here's a comprehensive explanation."
+        elements['comprehensive_explanation'] = "I'll provide a detailed overview."
+        elements['formal_explanation'] = "Allow me to elucidate this concept."
+        elements['academic_explanation'] = "From an educational standpoint:"
+        elements['formal_teaching'] = "I shall explain this systematically."
         
-        # Track strategy usage
-        if strategy not in self.stats['strategies_used']:
-            self.stats['strategies_used'][strategy] = 0
-        self.stats['strategies_used'][strategy] += 1
+        # Motivational elements
+        elements['motivation'] = "I believe in your capacity to succeed."
+        elements['next_steps'] = "Here's what you can do moving forward."
+        elements['action_steps'] = "Consider taking these practical steps."
+        elements['goal_alignment'] = "Let's align this with your objectives."
+        elements['energy'] = "You've got the energy to make this happen!"
+        elements['professional_motivation'] = "You have the skills to achieve this."
+        elements['structured_encouragement'] = "Success is within your reach."
+        elements['action_plan'] = "Here's a strategic action plan."
+        elements['professional_empowerment'] = "You're capable of handling this."
+        elements['guidance'] = "I'll guide you through this process."
+        elements['formal_encouragement'] = "Your success is entirely achievable."
+        elements['formal_motivation'] = "You possess the necessary capabilities."
+        elements['systematic_guidance'] = "Follow this systematic approach."
+        elements['formal_empowerment'] = "You are well-equipped to succeed."
+        elements['methodical_steps'] = "These methodical steps will help."
+        elements['strategic_steps'] = "Here are strategic steps to consider."
+        elements['structured_approach'] = "A structured approach will serve you well."
         
-        # Update average confidence
-        total_confidence = self.stats['average_confidence'] * (self.stats['total_conversations'] - 1)
-        self.stats['average_confidence'] = (total_confidence + emotion_result.confidence) / self.stats['total_conversations']
-
-    def _store_conversation(self, user_input: str, response: str, emotion_result: EmotionResult, strategy: str):
-        """Enhanced conversation storage with emotion tracking"""
-        conversation_entry = {
+        # Conversational elements
+        elements['conversational_response'] = "That's really interesting!"
+        elements['follow_up_question'] = "What's your take on this?"
+        elements['relatable_response'] = "I can relate to that perspective."
+        elements['engaging_continuation'] = "Tell me more about your thoughts."
+        elements['shared_interest'] = "I find this topic fascinating too."
+        elements['exploration'] = "Let's explore this together."
+        elements['professional_engagement'] = "I appreciate your perspective on this."
+        elements['thoughtful_response'] = "That's a thoughtful observation."
+        elements['professional_conversation'] = "Your insights are valuable."
+        elements['meaningful_exchange'] = "This is a meaningful discussion."
+        elements['professional_dialogue'] = "I value this professional dialogue."
+        elements['continued_discussion'] = "Let's continue this conversation."
+        elements['formal_acknowledgment'] = "I acknowledge your viewpoint."
+        elements['respectful_dialogue'] = "This is a respectful exchange."
+        elements['formal_engagement'] = "I appreciate your engagement."
+        elements['scholarly_discussion'] = "This scholarly discussion is valuable."
+        elements['formal_conversation'] = "I value this formal discourse."
+        elements['intellectual_exchange'] = "This intellectual exchange is enriching."
+        
+        # Strategy-specific elements based on topic
+        if context.topic == 'work':
+            elements['professional_support'] = "Let's work through this professional challenge together."
+            elements['analysis_intro'] = "From a work perspective,"
+            elements['action_steps'] = "Here are some practical steps you can take:"
+        elif context.topic == 'relationships':
+            elements['professional_support'] = "Relationship challenges can be complex to navigate."
+            elements['analysis_intro'] = "Looking at this relationship situation,"
+            elements['action_steps'] = "Consider these approaches:"
+        elif context.topic == 'finance':
+            elements['professional_support'] = "Financial decisions can have lasting impact."
+            elements['analysis_intro'] = "From a financial planning perspective,"
+            elements['action_steps'] = "Here are some financial strategies:"
+        else:
+            elements['professional_support'] = "I'm here to support you through this."
+            elements['analysis_intro'] = "Looking at this situation,"
+            elements['action_steps'] = "Here are some steps to consider:"
+        
+        return elements
+    
+    def _enhance_response_with_strategy(self, base_response: str, strategy, context) -> str:
+        """Enhance response based on selected strategy"""
+        enhancements = []
+        
+        if strategy.strategy_type == 'analytical':
+            if 'analysis' in strategy.content_focus:
+                enhancements.append("Let me break this down systematically for you.")
+            if 'options' in strategy.content_focus:
+                enhancements.append("Here are the key options to consider:")
+        
+        elif strategy.strategy_type == 'supportive':
+            if 'validation' in strategy.content_focus:
+                enhancements.append("Your feelings are completely valid and understandable.")
+            if 'encouragement' in strategy.content_focus:
+                enhancements.append("Remember, you have the strength to get through this.")
+        
+        elif strategy.strategy_type == 'motivational':
+            if 'action_steps' in strategy.content_focus:
+                enhancements.append("The important thing is taking that first step forward.")
+            if 'goals' in strategy.content_focus:
+                enhancements.append("Your goals are achievable with the right approach.")
+        
+        elif strategy.strategy_type == 'educational':
+            if 'explanation' in strategy.content_focus:
+                enhancements.append("I'll explain this in a way that's easy to understand.")
+            if 'examples' in strategy.content_focus:
+                enhancements.append("Let me give you some concrete examples.")
+        
+        # Add enhancements to response
+        if enhancements:
+            enhanced = base_response + " " + " ".join(enhancements)
+            return enhanced
+        
+        return base_response
+    
+    def _generate_fallback_response(self, context, emotion_result: Dict) -> str:
+        """Generate a safe fallback response"""
+        emotion = emotion_result.get('primary_emotion', 'uncertain')
+        topic = context.topic if hasattr(context, 'topic') else 'this situation'
+        
+        return f"I understand you're feeling {emotion} about {topic}. I'm here to help you work through this. What would be most helpful for you right now?"
+    
+    def _update_conversation_memory(self, user_input: str, emotion_result: Dict, 
+                                  context, response_content: str):
+        """Update conversation memory with enhanced context"""
+        memory_entry = {
             'timestamp': datetime.now(),
             'user_input': user_input,
-            'response': response,
-            'emotion': emotion_result.primary_emotion,
-            'emotion_confidence': emotion_result.confidence,
-            'strategy': strategy,
-            'context': emotion_result.context_keywords
+            'emotion': emotion_result.get('primary_emotion', 'neutral'),
+            'emotion_confidence': emotion_result.get('confidence', 0.0),
+            'topic': context.topic,
+            'user_goals': context.user_goals,
+            'conversation_stage': context.conversation_stage,
+            'urgency': context.urgency_level,
+            'formality': context.formality_level,
+            'response': response_content,
+            'strategy_used': getattr(context, 'strategy_type', 'unknown')
         }
         
-        self.conversation_memory.append(conversation_entry)
-        self.emotion_history.append(emotion_result)
+        self.conversation_history.append(memory_entry)
         
-        # Maintain memory limit
-        if len(self.conversation_memory) > self.max_memory_size:
-            self.conversation_memory.pop(0)
-        if len(self.emotion_history) > self.max_memory_size:
-            self.emotion_history.pop(0)
-
-    def get_enhanced_stats(self) -> Dict:
-        """Get comprehensive statistics including emotion analysis"""
-        runtime = (datetime.now() - self.stats['session_start']).total_seconds()
+        # Keep memory manageable (last 100 entries)
+        if len(self.conversation_history) > 100:
+            self.conversation_history = self.conversation_history[-100:]
+    
+    def _update_session_stats(self, emotion_result: Dict, context, strategy, processing_time: float):
+        """Update session statistics"""
+        self.session_stats['messages_processed'] += 1
+        self.session_stats['total_processing_time'] += processing_time
+        
+        # Update emotion statistics
+        emotion = emotion_result.get('primary_emotion', 'neutral')
+        self.session_stats['emotions_detected'][emotion] = \
+            self.session_stats['emotions_detected'].get(emotion, 0) + 1
+        
+        # Update topic statistics
+        topic = context.topic
+        self.session_stats['topics_discussed'][topic] = \
+            self.session_stats['topics_discussed'].get(topic, 0) + 1
+        
+        # Update strategy statistics
+        strategy_type = strategy.strategy_type
+        self.session_stats['strategies_used'][strategy_type] = \
+            self.session_stats['strategies_used'].get(strategy_type, 0) + 1
+        
+        # Update average confidence
+        confidence = emotion_result.get('confidence', 0.0) * 100
+        current_avg = self.session_stats['average_confidence']
+        message_count = self.session_stats['messages_processed']
+        
+        # Calculate running average
+        self.session_stats['average_confidence'] = \
+            ((current_avg * (message_count - 1)) + confidence) / message_count
+    
+    def get_conversation_summary(self) -> Dict[str, Any]:
+        """Get summary of current conversation"""
+        if not self.conversation_history:
+            return {'summary': 'No conversation history available'}
+        
+        recent_topics = []
+        recent_emotions = []
+        
+        # Analyze last 10 messages
+        for entry in self.conversation_history[-10:]:
+            if entry['topic'] not in recent_topics:
+                recent_topics.append(entry['topic'])
+            if entry['emotion'] not in recent_emotions:
+                recent_emotions.append(entry['emotion'])
         
         return {
-            'core_stats': self.stats,
-            'emotion_engine_stats': self.emotion_engine.get_engine_stats(),
-            'memory_usage': {
-                'conversations_stored': len(self.conversation_memory),
-                'emotions_tracked': len(self.emotion_history),
-                'memory_limit': self.max_memory_size
-            },
-            'performance': {
-                'session_runtime_seconds': runtime,
-                'conversations_per_minute': (self.stats['total_conversations'] / runtime * 60) if runtime > 0 else 0
-            },
-            'recent_emotions': [e.primary_emotion for e in self.emotion_history[-10:]] if self.emotion_history else []
+            'message_count': len(self.conversation_history),
+            'session_duration': str(datetime.now() - self.session_stats['session_start']).split('.')[0],
+            'recent_topics': recent_topics,
+            'recent_emotions': recent_emotions,
+            'conversation_stage': self.conversation_history[-1]['conversation_stage'] if self.conversation_history else 'opening',
+            'average_confidence': f"{self.session_stats['average_confidence']:.1f}%",
+            'most_discussed_topic': max(self.session_stats['topics_discussed'].items(), key=lambda x: x[1])[0] if self.session_stats['topics_discussed'] else 'none',
+            'most_common_emotion': max(self.session_stats['emotions_detected'].items(), key=lambda x: x[1])[0] if self.session_stats['emotions_detected'] else 'none'
         }
-
-    def get_conversation_history(self, limit: int = 10) -> List[Dict]:
-        """Get recent conversation history with emotion context"""
-        recent_conversations = self.conversation_memory[-limit:] if self.conversation_memory else []
+    
+    def get_user_insights(self) -> Dict[str, Any]:
+        """Get insights about user based on conversation history"""
+        user_profile = self.context_engine.user_profile
         
-        formatted_history = []
-        for conv in recent_conversations:
-            formatted_history.append({
-                'time': conv['timestamp'].strftime('%H:%M:%S'),
-                'user': conv['user_input'][:100] + ('...' if len(conv['user_input']) > 100 else ''),
-                'emotion': f"{conv['emotion'].title()} ({conv['emotion_confidence']:.0%})",
-                'strategy': conv['strategy'].replace('_', ' ').title(),
-                'context': ', '.join(conv['context']) if conv['context'] else 'None'
-            })
+        # Personality insights
+        personality = user_profile['personality_indicators']
+        dominant_trait = max(personality.items(), key=lambda x: x[1])
         
-        return formatted_history
-
-    def _create_error_response(self, error_message: str) -> Dict:
-        """Create standardized error response"""
+        # Communication style
+        comm_prefs = user_profile['communication_preferences']
+        
+        # Learning patterns
+        analytics = self.context_engine.get_analytics()
+        
         return {
-            'response': "I apologize, but I encountered an issue processing your message. Let me try to help you in a different way. Could you please rephrase your question?",
-            'emotion_analysis': {
-                'primary_emotion': 'neutral',
-                'confidence': 0.0,
-                'intensity': 'low',
-                'secondary_emotions': [],
-                'context': [],
-                'summary': 'Error in emotion detection'
+            'personality_profile': {
+                'dominant_trait': f"{dominant_trait[0]} ({dominant_trait[1]:.1%})",
+                'analytical_tendency': f"{personality['analytical']:.1%}",
+                'emotional_tendency': f"{personality['emotional']:.1%}",
+                'creative_tendency': f"{personality['creative']:.1%}"
             },
-            'strategy': {
-                'selected': 'knowledge_sharing',
-                'confidence': 0.0,
-                'description': 'Fallback error handling'
+            'communication_style': {
+                'preferred_detail_level': 'High' if comm_prefs['detail_level'] > 0.6 else 'Medium' if comm_prefs['detail_level'] > 0.3 else 'Low',
+                'formality_preference': 'Formal' if comm_prefs['formality'] > 0.6 else 'Professional' if comm_prefs['formality'] > 0.3 else 'Casual',
+                'directness_preference': 'Direct' if comm_prefs['directness'] > 0.6 else 'Balanced' if comm_prefs['directness'] > 0.3 else 'Indirect'
             },
-            'language': 'english',
-            'processing_time': 0.0,
-            'conversation_count': len(self.conversation_memory),
-            'timestamp': datetime.now().isoformat(),
-            'error': error_message
+            'interests_and_patterns': {
+                'top_topics': list(analytics['conversation_patterns']['topic_distribution'].keys())[:3],
+                'profile_maturity': f"{analytics['user_profile_maturity']['personality_confidence']:.1%}",
+                'learning_style': user_profile['learning_style']
+            }
         }
+    
+    def reset_session(self):
+        """Reset session statistics while preserving user profile"""
+        self.session_stats = {
+            'messages_processed': 0,
+            'total_processing_time': 0,
+            'average_confidence': 0,
+            'emotions_detected': {},
+            'topics_discussed': {},
+            'strategies_used': {},
+            'session_start': datetime.now()
+        }
+        self.conversation_history = []
+        self.logger.info("Session reset - user profile preserved")
+
+# Example usage and testing
+if __name__ == "__main__":
+    print("🤖 Enhanced Rudh Core - Phase 2.2")
+    print("Advanced emotion detection + context-aware responses")
+    print("="*60)
+    
+    async def test_enhanced_core():
+        # Initialize enhanced core
+        rudh = EnhancedRudhCore()
+        
+        # Test scenarios
+        test_scenarios = [
+            "I'm feeling really stressed about this work deadline coming up",
+            "Can you help me understand how to invest in the stock market?",
+            "My friend and I had a big argument, and I'm feeling sad about it",
+            "Thank you for all the help! This conversation has been really valuable",
+            "I'm excited about starting this new creative project but need some guidance"
+        ]
+        
+        print("\n🧪 Testing Enhanced Rudh Core:")
+        
+        for i, message in enumerate(test_scenarios, 1):
+            print(f"\n--- Test {i} ---")
+            print(f"User: {message}")
+            
+            # Process message
+            start_time = time.time()
+            result = await rudh.process_message(message)
+            processing_time = time.time() - start_time
+            
+            # Display results
+            print(f"Rudh: {result['response']}")
+            print(f"\n📊 Analysis:")
+            print(f"   Emotion: {result['emotion_analysis']['primary_emotion']} ({result['emotion_analysis']['confidence']:.1%} confidence)")
+            print(f"   Topic: {result['context_analysis']['topic']}")
+            print(f"   Strategy: {result['response_strategy']['strategy_type']} ({result['response_strategy']['confidence']:.1%} confidence)")
+            print(f"   Goals: {', '.join(result['context_analysis']['user_goals'])}")
+            print(f"   Processing Time: {result['performance_metrics']['total_processing_time']}")
+            
+            # Small delay for demonstration
+            await asyncio.sleep(0.5)
+        
+        # Display session summary
+        print(f"\n📈 Session Summary:")
+        summary = rudh.get_conversation_summary()
+        for key, value in summary.items():
+            print(f"   {key.replace('_', ' ').title()}: {value}")
+        
+        # Display user insights
+        print(f"\n👤 User Insights:")
+        insights = rudh.get_user_insights()
+        print(f"   Dominant Personality Trait: {insights['personality_profile']['dominant_trait']}")
+        print(f"   Communication Style: {insights['communication_style']['preferred_detail_level']} detail, {insights['communication_style']['formality_preference']} tone")
+        print(f"   Top Interests: {', '.join(insights['interests_and_patterns']['top_topics'])}")
+        
+        print(f"\n🎉 Enhanced Rudh Core test complete!")
+        print("Context-aware AI with emotion intelligence ready for deployment!")
+    
+    # Run the test
+    asyncio.run(test_enhanced_core())

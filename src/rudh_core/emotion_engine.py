@@ -1,13 +1,12 @@
-# src/rudh_core/emotion_engine.py
 """
-Rudh AI Enhanced Emotion Detection Engine - Phase 2.1 FIXED
+Rudh AI Enhanced Emotion Detection Engine - Phase 2.2 Compatible
 Advanced emotion recognition with 15+ emotions and optimized confidence scoring
 """
 
 import re
 import logging
 from dataclasses import dataclass
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Any
 from datetime import datetime
 
 @dataclass
@@ -24,7 +23,7 @@ class EnhancedEmotionEngine:
     """
     Advanced emotion detection engine for Rudh AI
     Supports 15+ emotions with contextual understanding
-    FIXED VERSION with optimized confidence scoring
+    FIXED VERSION with optimized confidence scoring and Phase 2.2 compatibility
     """
     
     def __init__(self):
@@ -154,6 +153,15 @@ class EnhancedEmotionEngine:
                 'base_weight': 0.9
             },
             
+            # Special case for frustration (maps to angry but distinct)
+            'frustrated': {
+                'keywords': ['frustrated', 'annoyed', 'irritated', 'fed up', 'sick of', 
+                           'aggravated', 'bothered', 'vexed'],
+                'patterns': [r'\b(so frustrated|really annoyed|fed up with|sick of)\b'],
+                'intensity_modifiers': {'very': 1.5, 'extremely': 2.0, 'really': 1.4, 'so': 1.3},
+                'base_weight': 1.0
+            },
+            
             # Neutral emotion
             'neutral': {
                 'keywords': ['okay', 'fine', 'normal', 'regular', 'usual', 'average'],
@@ -230,6 +238,43 @@ class EnhancedEmotionEngine:
         
         self.logger.debug(f"Emotion detected: {primary_emotion} (confidence: {confidence:.2f})")
         return result
+
+    async def analyze_emotion(self, text: str, context: Optional[Dict] = None) -> Dict[str, Any]:
+        """
+        Async wrapper for emotion analysis - Phase 2.2 compatibility
+        Converts EmotionResult to dictionary format expected by enhanced core
+        """
+        # Use existing detect_emotion method
+        emotion_result = self.detect_emotion(text, context)
+        
+        # Convert to dictionary format expected by Phase 2.2 core
+        return {
+            'primary_emotion': emotion_result.primary_emotion,
+            'confidence': emotion_result.confidence,
+            'intensity': emotion_result.emotional_intensity,
+            'secondary_emotions': [emotion for emotion, score in emotion_result.secondary_emotions],
+            'context_keywords': emotion_result.context_keywords,
+            'timestamp': emotion_result.timestamp.isoformat(),
+            'processing_time': '0.001s'  # Placeholder since it's very fast
+        }
+
+    def analyze_text_emotion(self, text: str, context: Optional[Dict] = None) -> Dict[str, Any]:
+        """
+        Synchronous version that returns dictionary format
+        """
+        # Use existing detect_emotion method  
+        emotion_result = self.detect_emotion(text, context)
+        
+        # Convert to dictionary format
+        return {
+            'primary_emotion': emotion_result.primary_emotion,
+            'confidence': emotion_result.confidence,
+            'intensity': emotion_result.emotional_intensity,
+            'secondary_emotions': [emotion for emotion, score in emotion_result.secondary_emotions],
+            'context_keywords': emotion_result.context_keywords,
+            'timestamp': emotion_result.timestamp.isoformat(),
+            'processing_time': '0.001s'
+        }
 
     def _calculate_emotion_score_fixed(self, text: str, patterns: Dict) -> float:
         """FIXED: Calculate emotion score with optimized algorithm"""
@@ -332,3 +377,43 @@ class EnhancedEmotionEngine:
             'total_keywords': sum(len(patterns['keywords']) for patterns in self.emotion_patterns.values()),
             'total_patterns': sum(len(patterns.get('patterns', [])) for patterns in self.emotion_patterns.values())
         }
+
+# Example usage and testing
+if __name__ == "__main__":
+    print("😊 Enhanced Emotion Detection Engine - Phase 2.2 Compatible")
+    print("="*60)
+    
+    # Initialize engine
+    engine = EnhancedEmotionEngine()
+    
+    # Test cases
+    test_cases = [
+        "I'm so frustrated to lead this life",
+        "Thank you so much for your help!",
+        "I'm feeling really anxious about the exam tomorrow",
+        "This is amazing! I'm so excited about the opportunity",
+        "I'm confused about what to do next"
+    ]
+    
+    print("\n🧪 Testing Enhanced Emotion Engine:")
+    for i, text in enumerate(test_cases, 1):
+        print(f"\nTest {i}: '{text}'")
+        
+        # Test original method
+        result = engine.detect_emotion(text)
+        print(f"Original: {result.primary_emotion} ({result.confidence:.1%})")
+        
+        # Test Phase 2.2 compatible method
+        import asyncio
+        async def test_async():
+            return await engine.analyze_emotion(text)
+        
+        dict_result = asyncio.run(test_async())
+        print(f"Phase 2.2: {dict_result['primary_emotion']} ({dict_result['confidence']:.1%})")
+    
+    print(f"\n📊 Engine Statistics:")
+    stats = engine.get_engine_stats()
+    for key, value in stats.items():
+        print(f"   {key.replace('_', ' ').title()}: {value}")
+    
+    print("\n✅ Enhanced Emotion Engine ready for Phase 2.2 integration!")

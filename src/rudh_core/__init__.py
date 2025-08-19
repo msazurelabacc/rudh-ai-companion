@@ -1,32 +1,51 @@
-# src\rudh_core\__init__.py
 """
-Rudh AI Companion - Core Module
-Main brain and intelligence engine for Rudh
+Rudh AI Core Package - Phase 2.2
+Enhanced emotion detection and context-aware AI companion
 """
 
-__version__ = "0.1.0"
-__author__ = "Sankar Narayanan"
-__description__ = "Advanced AI Companion with Emotional Intelligence"
+__version__ = "2.2.0"
+__author__ = "Rudh AI Project"
 
-# Main exports
-from .core import RudhCore
-
-# Optional imports - only import if modules exist
+# Import Phase 2.2 components
 try:
-    from .emotional_intelligence import EmotionalIntelligence
-    EMOTIONAL_INTELLIGENCE_AVAILABLE = True
-except ImportError:
-    EMOTIONAL_INTELLIGENCE_AVAILABLE = False
+    from .emotion_engine import EnhancedEmotionEngine
+    from .context_engine import AdvancedContextEngine, ConversationContext, ResponseStrategy
+    from .core import EnhancedRudhCore
+    
+    # Backward compatibility - alias old names to new ones
+    RudhCore = EnhancedRudhCore  # For backward compatibility
+    
+    __all__ = [
+        'EnhancedEmotionEngine',
+        'AdvancedContextEngine', 
+        'ConversationContext',
+        'ResponseStrategy',
+        'EnhancedRudhCore',
+        'RudhCore'  # Backward compatibility
+    ]
+    
+except ImportError as e:
+    print(f"Warning: Could not import some Rudh components: {e}")
+    __all__ = []
 
-try:
-    from .financial_advisor import FinancialAdvisor
-    FINANCIAL_ADVISOR_AVAILABLE = True
-except ImportError:
-    FINANCIAL_ADVISOR_AVAILABLE = False
+# Package information
+def get_version():
+    """Get the current version of Rudh AI"""
+    return __version__
 
-# Core exports
-__all__ = [
-    "RudhCore",
-    "EMOTIONAL_INTELLIGENCE_AVAILABLE", 
-    "FINANCIAL_ADVISOR_AVAILABLE"
-]
+def get_info():
+    """Get package information"""
+    return {
+        'name': 'Rudh AI Companion',
+        'version': __version__,
+        'description': 'Advanced emotion detection and context-aware AI companion',
+        'phase': '2.2 - Context-Aware Response Generation',
+        'features': [
+            '16+ emotion types with confidence scoring',
+            'Advanced context analysis (7 topic categories)',
+            'Intelligent response strategies (5 types)',
+            'Multi-turn conversation awareness',
+            'User personality learning',
+            'Real-time performance analytics'
+        ]
+    }
