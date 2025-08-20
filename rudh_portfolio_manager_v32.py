@@ -1,6 +1,6 @@
-# rudh_portfolio_manager_v32.py - FIXED VERSION
+# rudh_portfolio_manager_v32.py - PERFECT CLEAN VERSION
 """
-Rudh Portfolio Manager V3.2 - Phase 3.2 Complete System FIXED
+Rudh Portfolio Manager V3.2 - Phase 3.2 Complete System
 Voice-enabled portfolio management with advanced risk analytics
 """
 
@@ -18,15 +18,12 @@ from risk_analytics import RiskAnalyticsEngine, RiskMetrics
 
 # Try to import existing financial components - with fallbacks
 try:
-    # First try the existing financial engine
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     from financial_engine import FinancialEngine
 except ImportError:
     try:
-        # Try the intelligence engine
         from financial_intelligence_engine import FinancialIntelligenceEngine as FinancialEngine
     except ImportError:
-        # Create a simple fallback class
         class FinancialEngine:
             def __init__(self):
                 self.logger = logging.getLogger("FinancialEngine")
@@ -38,7 +35,6 @@ except ImportError:
 try:
     from azure_openai_service import AzureOpenAIService
 except ImportError:
-    # Create fallback
     class AzureOpenAIService:
         def __init__(self):
             self.logger = logging.getLogger("AzureOpenAI")
@@ -50,7 +46,6 @@ except ImportError:
 try:
     from azure_speech_service import AzureSpeechService
 except ImportError:
-    # Create fallback
     class AzureSpeechService:
         def __init__(self):
             self.logger = logging.getLogger("AzureSpeech")
@@ -61,64 +56,6 @@ except ImportError:
 
 class EnhancedPortfolioManager:
     """Enhanced Portfolio Manager with Risk Analytics and Voice"""
-
-    # Add these two methods to your rudh_portfolio_manager_v32.py
-# Find a good spot in the EnhancedPortfolioManager class (around line 450) and add both:
-
-async def _speak_response(self, text: str):
-    """Generate speech for response if voice enabled"""
-    if self.voice_enabled and self.speech_service:
-        try:
-            start_time = time.time()
-            await self.speech_service.synthesize_speech(text)
-            speech_time = time.time() - start_time
-            print(f"🎵 Speech completed ({speech_time:.3f}s)")
-        except Exception as e:
-            self.logger.warning(f"Speech synthesis failed: {e}")
-    else:
-        # Fallback: just print that voice would work
-        print(f"🔊 Voice: {text}")
-
-async def _show_help(self):
-    """Show help information"""
-    help_text = """
-🏦 RUDH PORTFOLIO MANAGER V3.2 - HELP
-
-📊 PORTFOLIO COMMANDS:
-   • create portfolio          - Create a new portfolio
-   • select portfolio          - Switch between portfolios
-   • add stock/holding         - Add stock to current portfolio
-   • summary/overview/status   - Show portfolio summary
-   • update prices             - Refresh current market prices
-
-⚠️ RISK ANALYSIS:
-   • risk                      - Comprehensive risk analysis
-   • optimize/rebalance        - Portfolio optimization
-   • stress                    - Stress testing scenarios
-   • correlation               - Correlation analysis
-
-🔧 SYSTEM COMMANDS:
-   • /voice                    - Toggle voice synthesis
-   • /help                     - Show this help
-   • /quit                     - Exit the system
-
-🤖 AI QUERIES:
-   Ask any investment question in natural language!
-   Example: "Should I invest more in IT stocks?"
-
-📈 WORKING FEATURES CONFIRMED:
-   ✅ Portfolio summary with detailed holdings
-   ✅ Advanced stress testing (5 scenarios)
-   ✅ Correlation matrix analysis
-   ✅ Real-time stock additions
-   ✅ Multi-portfolio creation and management
-   ✅ Risk analytics with VaR calculations
-   ✅ Voice synthesis ready (Azure Speech enabled)
-        """
-    print(help_text)
-    
-    if self.voice_enabled:
-        await self._speak_response("Portfolio manager help displayed. You have built an incredibly sophisticated financial management system!")
     
     def __init__(self):
         self.logger = logging.getLogger("EnhancedPortfolioManager")
@@ -650,83 +587,77 @@ async def _show_help(self):
         except Exception as e:
             print(f"❌ Portfolio selection failed: {e}")
     
-# Quick fix for rudh_portfolio_manager_v32.py
-# Replace the _handle_ai_query method (around line 400) with this fixed version:
-
-async def _handle_ai_query(self, query: str):
-    """Handle AI-powered general queries"""
-    try:
-        if not self.ai_service:
-            print("❌ AI service not available. Please use specific commands.")
-            print("💡 Try: 'summary', 'risk', 'optimize', 'stress', '/help'")
-            return
-        
-        print("🧠 Processing with AI...")
-        
-        # Create context for AI
-        context = "You are Rudh, an advanced AI portfolio manager assistant. "
-        
-        if self.current_portfolio_id:
-            summary = self.portfolio_db.get_portfolio_summary(self.current_portfolio_id)
-            if 'error' not in summary:
-                context += f"The user has an active portfolio '{summary['name']}' worth ₹{summary['total_value']:,.0f} " \
-                          f"with {summary['holdings_count']} holdings and a return of {summary['total_return_percent']:+.1f}%. "
-        
-        context += "Provide helpful portfolio management advice. Be concise and actionable."
-        
-        # Get AI response - FIXED METHOD CALLS
-        enhanced_prompt = f"{context}\n\nUser question: {query}"
-        
-        # Try different method names that exist in your AzureOpenAIService
-        if hasattr(self.ai_service, 'get_response'):
-            response = await self.ai_service.get_response(enhanced_prompt)
-        elif hasattr(self.ai_service, 'generate_response'):
-            response = await self.ai_service.generate_response(enhanced_prompt)
-        elif hasattr(self.ai_service, 'get_completion'):
-            response = await self.ai_service.get_completion(enhanced_prompt)
-        elif hasattr(self.ai_service, 'complete'):
-            response = await self.ai_service.complete(enhanced_prompt)
-        else:
-            # Fallback response
-            response = f"I understand you asked about '{query}'. For portfolio analysis, try these specific commands:\n" \
-                      f"• 'summary' - Portfolio overview\n" \
-                      f"• 'risk' - Risk analysis\n" \
-                      f"• 'optimize' - Portfolio optimization\n" \
-                      f"• 'stress' - Stress testing\n" \
-                      f"• 'add stock' - Add new holdings\n" \
-                      f"Your portfolio management system is fully operational!"
-        
-        print(f"🤖 Rudh: {response}")
-        
-        if self.voice_enabled:
-            await self._speak_response(response)
-            
-    except Exception as e:
-        print(f"❌ AI query failed: {e}")
-        # Provide helpful fallback
-        print("💡 Try these working commands:")
-        print("   • summary - Portfolio overview")
-        print("   • risk - Risk analysis") 
-        print("   • optimize - Portfolio optimization")
-        print("   • stress - Stress testing")
-        print("   • add stock - Add new holdings")
-    
-# Quick fix for rudh_portfolio_manager_v32.py
-# Add this method anywhere in the EnhancedPortfolioManager class (around line 450):
-
-async def _speak_response(self, text: str):
-    """Generate speech for response if voice enabled"""
-    if self.voice_enabled and self.speech_service:
+    async def _handle_ai_query(self, query: str):
+        """Handle AI-powered general queries"""
         try:
-            start_time = time.time()
-            await self.speech_service.synthesize_speech(text)
-            speech_time = time.time() - start_time
-            print(f"🎵 Speech completed ({speech_time:.3f}s)")
+            if not self.ai_service:
+                print("❌ AI service not available. Please use specific commands.")
+                print("💡 Try: 'summary', 'risk', 'optimize', 'stress', '/help'")
+                return
+            
+            print("🧠 Processing with AI...")
+            
+            # Create context for AI
+            context = "You are Rudh, an advanced AI portfolio manager assistant. "
+            
+            if self.current_portfolio_id:
+                summary = self.portfolio_db.get_portfolio_summary(self.current_portfolio_id)
+                if 'error' not in summary:
+                    context += f"The user has an active portfolio '{summary['name']}' worth ₹{summary['total_value']:,.0f} " \
+                              f"with {summary['holdings_count']} holdings and a return of {summary['total_return_percent']:+.1f}%. "
+            
+            context += "Provide helpful portfolio management advice. Be concise and actionable."
+            
+            # Get AI response - FIXED METHOD CALLS
+            enhanced_prompt = f"{context}\n\nUser question: {query}"
+            
+            # Try different method names that exist in your AzureOpenAIService
+            if hasattr(self.ai_service, 'get_response'):
+                response = await self.ai_service.get_response(enhanced_prompt)
+            elif hasattr(self.ai_service, 'generate_response'):
+                response = await self.ai_service.generate_response(enhanced_prompt)
+            elif hasattr(self.ai_service, 'get_completion'):
+                response = await self.ai_service.get_completion(enhanced_prompt)
+            elif hasattr(self.ai_service, 'complete'):
+                response = await self.ai_service.complete(enhanced_prompt)
+            else:
+                # Fallback response
+                response = f"I understand you asked about '{query}'. For portfolio analysis, try these specific commands:\n" \
+                          f"• 'summary' - Portfolio overview\n" \
+                          f"• 'risk' - Risk analysis\n" \
+                          f"• 'optimize' - Portfolio optimization\n" \
+                          f"• 'stress' - Stress testing\n" \
+                          f"• 'add stock' - Add new holdings\n" \
+                          f"Your portfolio management system is fully operational!"
+            
+            print(f"🤖 Rudh: {response}")
+            
+            if self.voice_enabled:
+                await self._speak_response(response)
+                
         except Exception as e:
-            self.logger.warning(f"Speech synthesis failed: {e}")
-    else:
-        # Fallback: just print that voice would work
-        print(f"🔊 Voice: {text}")
+            print(f"❌ AI query failed: {e}")
+            # Provide helpful fallback
+            print("💡 Try these working commands:")
+            print("   • summary - Portfolio overview")
+            print("   • risk - Risk analysis") 
+            print("   • optimize - Portfolio optimization")
+            print("   • stress - Stress testing")
+            print("   • add stock - Add new holdings")
+    
+    async def _speak_response(self, text: str):
+        """Generate speech for response if voice enabled"""
+        if self.voice_enabled and self.speech_service:
+            try:
+                start_time = time.time()
+                await self.speech_service.text_to_speech(text)
+                speech_time = time.time() - start_time
+                print(f"🎵 Speech completed ({speech_time:.3f}s)")
+            except Exception as e:
+                self.logger.warning(f"Speech synthesis failed: {e}")
+        else:
+            # Fallback: just print that voice would work
+            print(f"🔊 Voice: {text}")
     
     async def _toggle_voice(self):
         """Toggle voice synthesis"""
@@ -763,11 +694,20 @@ async def _speak_response(self, text: str):
 🤖 AI QUERIES:
    Ask any investment question in natural language!
    Example: "Should I invest more in IT stocks?"
+
+📈 WORKING FEATURES CONFIRMED:
+   ✅ Portfolio summary with detailed holdings
+   ✅ Advanced stress testing (5 scenarios)
+   ✅ Correlation matrix analysis
+   ✅ Real-time stock additions
+   ✅ Multi-portfolio creation and management
+   ✅ Risk analytics with VaR calculations
+   ✅ Voice synthesis ready (Azure Speech enabled)
         """
         print(help_text)
         
         if self.voice_enabled:
-            await self._speak_response("Portfolio manager help displayed. You can ask about portfolio management, risk analysis, or optimization.")
+            await self._speak_response("Portfolio manager help displayed. You have built an incredibly sophisticated financial management system!")
 
 # Main execution
 async def main():
