@@ -645,19 +645,37 @@ class EnhancedPortfolioManager:
             print("   • stress - Stress testing")
             print("   • add stock - Add new holdings")
     
-    async def _speak_response(self, text: str):
-        """Generate speech for response if voice enabled"""
-        if self.voice_enabled and self.speech_service:
-            try:
-                start_time = time.time()
+async def _speak_response(self, text: str):
+    """Generate speech for response if voice enabled"""
+    if self.voice_enabled and self.speech_service:
+        try:
+            start_time = time.time()
+            
+            # Try multiple possible method names
+            if hasattr(self.speech_service, 'text_to_speech'):
                 await self.speech_service.text_to_speech(text)
-                speech_time = time.time() - start_time
-                print(f"🎵 Speech completed ({speech_time:.3f}s)")
-            except Exception as e:
-                self.logger.warning(f"Speech synthesis failed: {e}")
-        else:
-            # Fallback: just print that voice would work
-            print(f"🔊 Voice: {text}")
+            elif hasattr(self.speech_service, 'synthesize_speech'):
+                await self.speech_service.synthesize_speech(text)
+            elif hasattr(self.speech_service, 'speak'):
+                await self.speech_service.speak(text)
+            elif hasattr(self.speech_service, 'say'):
+                await self.speech_service.say(text)
+            else:
+                # If no method found, list available methods for debugging
+                methods = [m for m in dir(self.speech_service) if not m.startswith('_') and callable(getattr(self.speech_service, m))]
+                print(f"🔊 Voice methods available: {methods}")
+                print(f"🔊 Voice: {text}")
+                return
+            
+            speech_time = time.time() - start_time
+            print(f"🎵 Speech completed ({speech_time:.3f}s)")
+            
+        except Exception as e:
+            self.logger.warning(f"Speech synthesis failed: {e}")
+            print(f"🔊 Voice fallback: {text}")
+    else:
+        # Fallback: just print that voice would work
+        print(f"🔊 Voice: {text}")
     
     async def _toggle_voice(self):
         """Toggle voice synthesis"""
