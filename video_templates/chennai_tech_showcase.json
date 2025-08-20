@@ -1,0 +1,12 @@
+{
+  "name": "Chennai Tech Showcase",
+  "description": "Technology showcase optimized for Chennai market",
+  "duration": 240,
+  "voice_persona": "authoritative",
+  "music_theme": "innovation",
+  "local_context": {
+    "market_focus": "Tamil Nadu technology sector",
+    "cultural_elements": "Chennai business culture",
+    "language_style": "Indian English with local relevance"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Business Explainer",
+  "description": "Professional business concept explanation",
+  "duration": 180,
+  "scenes": [
+    {
+      "type": "title",
+      "duration": 10,
+      "template": "Welcome to {topic} - Your Complete Guide"
+    },
+    {
+      "type": "introduction",
+      "duration": 30,
+      "template": "Understanding {topic} fundamentals and key benefits"
+    },
+    {
+      "type": "main_content",
+      "duration": 120,
+      "template": "Deep dive into {topic} with practical examples"
+    },
+    {
+      "type": "conclusion",
+      "duration": 20,
+      "template": "Key takeaways and next steps for {topic}"
+    }
+  ]
+}

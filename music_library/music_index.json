@@ -1,0 +1,40 @@
+{
+  "library_info": {
+    "version": "1.0",
+    "categories": 4,
+    "total_tracks": 16,
+    "notes": "Placeholder files created. Replace with royalty-free music tracks."
+  },
+  "categories": {
+    "corporate": [
+      "corporate_professional.mp3",
+      "corporate_inspiring.mp3",
+      "corporate_uplifting.mp3",
+      "corporate_success.mp3"
+    ],
+    "tech": [
+      "tech_innovation.mp3",
+      "tech_modern.mp3",
+      "tech_digital.mp3",
+      "tech_futuristic.mp3"
+    ],
+    "finance": [
+      "finance_growth.mp3",
+      "finance_stability.mp3",
+      "finance_success.mp3",
+      "finance_prosperity.mp3"
+    ],
+    "social": [
+      "social_uplifting.mp3",
+      "social_energetic.mp3",
+      "social_dynamic.mp3",
+      "social_engaging.mp3"
+    ]
+  },
+  "usage_guidelines": {
+    "corporate": "Professional business content, presentations, corporate communications",
+    "tech": "Technology showcases, innovation content, startup pitches",
+    "finance": "Investment content, financial education, wealth management",
+    "social": "Social media content, engaging videos, marketing materials"
+  }
+}

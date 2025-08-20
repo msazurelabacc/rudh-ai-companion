@@ -1,0 +1,11 @@
+{
+  "name": "Investment Analysis",
+  "description": "Financial analysis and recommendations",
+  "duration": 300,
+  "sections": [
+    "Market overview",
+    "Risk assessment",
+    "Opportunity analysis",
+    "Recommendations"
+  ]
+}

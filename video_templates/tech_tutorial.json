@@ -1,0 +1,6 @@
+{
+  "name": "Technical Tutorial",
+  "description": "Step-by-step technical instruction",
+  "duration": 420,
+  "structure": "problem -> solution -> implementation -> results"
+}

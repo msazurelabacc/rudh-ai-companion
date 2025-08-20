@@ -1,0 +1,62 @@
+{
+  "ultra": {
+    "name": "Ultra Quality",
+    "resolution": [
+      1920,
+      1080
+    ],
+    "fps": 30,
+    "bitrate": "8000k",
+    "audio_bitrate": "320k",
+    "codec": "libx264",
+    "crf": 18,
+    "preset": "slow",
+    "use_case": "Client presentations, demos, high-value content",
+    "file_size_estimate": "Large (100-200MB per minute)"
+  },
+  "high": {
+    "name": "High Quality",
+    "resolution": [
+      1920,
+      1080
+    ],
+    "fps": 30,
+    "bitrate": "4000k",
+    "audio_bitrate": "192k",
+    "codec": "libx264",
+    "crf": 23,
+    "preset": "medium",
+    "use_case": "Business videos, training content, proposals",
+    "file_size_estimate": "Medium (50-100MB per minute)"
+  },
+  "web": {
+    "name": "Web Optimized",
+    "resolution": [
+      1920,
+      1080
+    ],
+    "fps": 25,
+    "bitrate": "2000k",
+    "audio_bitrate": "128k",
+    "codec": "libx264",
+    "crf": 28,
+    "preset": "fast",
+    "use_case": "Website content, social media, email campaigns",
+    "file_size_estimate": "Small (25-50MB per minute)"
+  },
+  "mobile": {
+    "name": "Mobile Friendly",
+    "resolution": [
+      1280,
+      720
+    ],
+    "fps": 25,
+    "bitrate": "1000k",
+    "audio_bitrate": "96k",
+    "codec": "libx264",
+    "crf": 32,
+    "preset": "fast",
+    "use_case": "Mobile apps, WhatsApp sharing, quick previews",
+    "file_size_estimate": "Very Small (10-25MB per minute)"
+  }
+}

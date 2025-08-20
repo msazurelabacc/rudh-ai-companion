@@ -1,0 +1,54 @@
+{
+  "professional": {
+    "voice": "en-IN-NeerjaNeural",
+    "style": "professional",
+    "rate": "0%",
+    "pitch": "0%",
+    "volume": "100%",
+    "emphasis": "moderate",
+    "use_cases": [
+      "Business presentations",
+      "Corporate communications",
+      "Professional explanations"
+    ]
+  },
+  "enthusiastic": {
+    "voice": "en-IN-NeerjaNeural",
+    "style": "excited",
+    "rate": "+10%",
+    "pitch": "+5%",
+    "volume": "105%",
+    "emphasis": "strong",
+    "use_cases": [
+      "Product launches",
+      "Marketing content",
+      "Motivational content"
+    ]
+  },
+  "authoritative": {
+    "voice": "en-IN-PrabhatNeural",
+    "style": "serious",
+    "rate": "-5%",
+    "pitch": "-2%",
+    "volume": "100%",
+    "emphasis": "commanding",
+    "use_cases": [
+      "Technical explanations",
+      "Expert analysis",
+      "Educational content"
+    ]
+  },
+  "friendly_expert": {
+    "voice": "en-IN-NeerjaNeural",
+    "style": "friendly",
+    "rate": "+5%",
+    "pitch": "+2%",
+    "volume": "100%",
+    "emphasis": "warm",
+    "use_cases": [
+      "Tutorial content",
+      "Explanatory videos",
+      "Customer education"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Professional Investment Education",
+  "description": "Investment education with Tamil Nadu market insights",
+  "duration": 420,
+  "voice_persona": "friendly_expert",
+  "music_theme": "growth_stability",
+  "educational_structure": {
+    "introduction": "Welcoming and accessible",
+    "core_content": "Detailed explanations with examples",
+    "practical_application": "Chennai market case studies",
+    "conclusion": "Actionable next steps"
+  }
+}

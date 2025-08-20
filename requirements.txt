@@ -1,36 +1,28 @@
-# Existing dependencies
+
+# Phase 4.3 Enhanced Video Creation Dependencies  
+moviepy>=1.0.3
+scipy>=1.11.0
+librosa>=0.10.0
+pydub>=0.25.1
+
+# Advanced audio processing
+ffmpeg-python>=0.2.0
+soundfile>=0.12.1
+mutagen>=1.47.0
+
+# Existing Phase 4.2 dependencies
+opencv-python>=4.8.0
+Pillow>=10.0.0
+matplotlib>=3.7.0
+numpy>=1.24.0
+imageio>=2.31.0
+imageio-ffmpeg>=0.4.8
+
+# Core Azure and AI dependencies
 azure-identity>=1.15.0
 azure-keyvault-secrets>=4.7.0
-azure-storage-blob>=12.19.0
 azure-cognitiveservices-speech>=1.34.0
 azure-ai-translation-text>=1.0.0
-azure-search-documents>=11.4.0
-
-# OpenAI Integration
 openai>=1.6.1
-
-# Enhanced dependencies for Phase 2.3
-azure-core>=1.29.0
-azure-mgmt-cognitiveservices>=13.5.0
-aiofiles>=23.2.1
-
-# Web Framework
 fastapi>=0.104.1
-uvicorn[standard]>=0.24.0
-
-# Data Processing
-pandas>=2.2.0
-numpy>=1.26.0
-scikit-learn>=1.4.0
-
-# Financial Data
-yfinance>=0.2.0
-
-# Development Tools
-pytest>=7.4.0
-pytest-asyncio>=0.21.0
-python-dotenv>=1.0.0
-
-# Utilities
 requests>=2.31.0
-aiohttp>=3.9.0

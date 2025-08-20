@@ -1,0 +1,40 @@
+{
+  "name": "Enhanced Business Pitch",
+  "description": "Professional business pitch with voice narration and music",
+  "duration": 300,
+  "voice_persona": "enthusiastic",
+  "music_theme": "inspiring",
+  "slide_transitions": "fade_professional",
+  "scenes": [
+    {
+      "type": "hook",
+      "duration": 45,
+      "narration_style": "compelling_opening",
+      "visual_style": "dynamic_intro"
+    },
+    {
+      "type": "problem",
+      "duration": 60,
+      "narration_style": "authoritative_analysis",
+      "visual_style": "data_driven"
+    },
+    {
+      "type": "solution",
+      "duration": 90,
+      "narration_style": "confident_presentation",
+      "visual_style": "solution_focused"
+    },
+    {
+      "type": "evidence",
+      "duration": 75,
+      "narration_style": "results_oriented",
+      "visual_style": "proof_points"
+    },
+    {
+      "type": "call_to_action",
+      "duration": 30,
+      "narration_style": "motivational_close",
+      "visual_style": "action_oriented"
+    }
+  ]
+}
