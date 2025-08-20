@@ -8,6 +8,7 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Optional, Any
 from datetime import datetime
+from typing import Dict, List, Tuple, Optional, Any  # Add 'Any' to existing import
 
 @dataclass
 class EmotionResult:
