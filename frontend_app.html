@@ -1,0 +1,481 @@
+import React, { useState, useEffect } from 'react';
+import { Play, Upload, Download, Settings, Users, BarChart3, Video, Mic, Sparkles, Check, Clock, AlertCircle } from 'lucide-react';
+
+const RudhVideoStudio = () => {
+  const [activeView, setActiveView] = useState('dashboard');
+  const [userSubscription, setUserSubscription] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [creatingVideo, setCreatingVideo] = useState(false);
+  const [newProject, setNewProject] = useState({
+    title: '',
+    description: '',
+    template: 'business_presentation',
+    voice_persona: 'professional'
+  });
+
+  // Mock user data
+  useEffect(() => {
+    setUserSubscription({
+      plan: 'Professional',
+      videos_remaining: 85,
+      voice_minutes_remaining: 420.5,
+      active: true
+    });
+    
+    setProjects([
+      {
+        project_id: 'proj_001',
+        title: 'AI Portfolio Management Overview',
+        status: 'completed',
+        created_at: '2025-08-20T10:30:00Z',
+        template: 'financial_education',
+        voice_persona: 'professional'
+      },
+      {
+        project_id: 'proj_002', 
+        title: 'Chennai Tech Innovation Showcase',
+        status: 'completed',
+        created_at: '2025-08-20T14:15:00Z',
+        template: 'tech_showcase',
+        voice_persona: 'enthusiastic'
+      },
+      {
+        project_id: 'proj_003',
+        title: 'Investment Strategy for Tamil Nadu',
+        status: 'creating',
+        created_at: '2025-08-20T16:20:00Z',
+        template: 'business_presentation',
+        voice_persona: 'authoritative'
+      }
+    ]);
+  }, []);
+
+  const templates = [
+    {
+      id: 'business_presentation',
+      name: 'Business Presentation',
+      description: 'Professional business presentations for Chennai market',
+      icon: '🏢',
+      voice_personas: ['professional', 'authoritative'],
+      duration: '3-5 minutes'
+    },
+    {
+      id: 'tech_showcase',
+      name: 'Technology Innovation', 
+      description: 'Technology and innovation showcases',
+      icon: '🚀',
+      voice_personas: ['enthusiastic', 'professional'],
+      duration: '2-4 minutes'
+    },
+    {
+      id: 'financial_education',
+      name: 'Financial Education',
+      description: 'Investment and financial education content',
+      icon: '📊',
+      voice_personas: ['authoritative', 'friendly'],
+      duration: '4-7 minutes'
+    },
+    {
+      id: 'social_impact',
+      name: 'Social Impact',
+      description: 'Social impact and community content',
+      icon: '🌍',
+      voice_personas: ['friendly', 'tamil_friendly'],
+      duration: '3-6 minutes'
+    }
+  ];
+
+  const voicePersonas = [
+    { id: 'professional', name: 'Professional', description: 'Clear, business-appropriate voice' },
+    { id: 'enthusiastic', name: 'Enthusiastic', description: 'Energetic and engaging tone' },
+    { id: 'authoritative', name: 'Authoritative', description: 'Confident and expert delivery' },
+    { id: 'friendly', name: 'Friendly', description: 'Warm and approachable voice' },
+    { id: 'tamil_friendly', name: 'Tamil Friendly', description: 'Local Chennai accent and warmth' }
+  ];
+
+  const handleCreateVideo = async () => {
+    if (!newProject.title) return;
+    
+    setCreatingVideo(true);
+    
+    // Simulate API call
+    const projectId = `proj_${Date.now()}`;
+    const newVideoProject = {
+      project_id: projectId,
+      title: newProject.title,
+      status: 'creating',
+      created_at: new Date().toISOString(),
+      template: newProject.template,
+      voice_persona: newProject.voice_persona
+    };
+    
+    setProjects(prev => [newVideoProject, ...prev]);
+    
+    // Simulate video creation process
+    setTimeout(() => {
+      setProjects(prev => 
+        prev.map(p => 
+          p.project_id === projectId 
+            ? { ...p, status: 'completed' }
+            : p
+        )
+      );
+      setCreatingVideo(false);
+      setUserSubscription(prev => ({ ...prev, videos_remaining: prev.videos_remaining - 1 }));
+    }, 3000);
+    
+    // Reset form
+    setNewProject({
+      title: '',
+      description: '',
+      template: 'business_presentation', 
+      voice_persona: 'professional'
+    });
+  };
+
+  const StatusBadge = ({ status }) => {
+    const statusConfig = {
+      completed: { color: 'bg-green-100 text-green-800', icon: Check, text: 'Completed' },
+      creating: { color: 'bg-blue-100 text-blue-800', icon: Clock, text: 'Creating...' },
+      failed: { color: 'bg-red-100 text-red-800', icon: AlertCircle, text: 'Failed' }
+    };
+    
+    const config = statusConfig[status] || statusConfig.creating;
+    const Icon = config.icon;
+    
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+        <Icon className="w-3 h-3 mr-1" />
+        {config.text}
+      </span>
+    );
+  };
+
+  const Dashboard = () => (
+    <div className="space-y-6">
+      {/* Header Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Video className="w-6 h-6 text-blue-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Videos Remaining</p>
+              <p className="text-2xl font-bold text-gray-900">{userSubscription?.videos_remaining || 0}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <Mic className="w-6 h-6 text-green-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Voice Minutes</p>
+              <p className="text-2xl font-bold text-gray-900">{Math.floor(userSubscription?.voice_minutes_remaining || 0)}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <BarChart3 className="w-6 h-6 text-purple-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Total Projects</p>
+              <p className="text-2xl font-bold text-gray-900">{projects.length}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-yellow-100 rounded-lg">
+              <Sparkles className="w-6 h-6 text-yellow-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Plan</p>
+              <p className="text-2xl font-bold text-gray-900">{userSubscription?.plan || 'Free'}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Recent Projects */}
+      <div className="bg-white rounded-lg shadow">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900">Recent Projects</h3>
+        </div>
+        <div className="p-6">
+          <div className="space-y-4">
+            {projects.slice(0, 5).map((project) => (
+              <div key={project.project_id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div className="flex-1">
+                  <h4 className="text-sm font-medium text-gray-900">{project.title}</h4>
+                  <p className="text-sm text-gray-500">
+                    {new Date(project.created_at).toLocaleDateString()} • {project.voice_persona} voice
+                  </p>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <StatusBadge status={project.status} />
+                  {project.status === 'completed' && (
+                    <button className="flex items-center text-blue-600 hover:text-blue-800">
+                      <Download className="w-4 h-4 mr-1" />
+                      Download
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const CreateVideo = () => (
+    <div className="max-w-2xl mx-auto">
+      <div className="bg-white rounded-lg shadow">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900">Create New Video</h3>
+          <p className="text-sm text-gray-500">Generate professional videos with AI-powered voice narration</p>
+        </div>
+        <div className="p-6 space-y-6">
+          {/* Video Title */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Video Title</label>
+            <input
+              type="text"
+              value={newProject.title}
+              onChange={(e) => setNewProject(prev => ({ ...prev, title: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="e.g., AI Portfolio Management for Chennai Businesses"
+            />
+          </div>
+          
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Description (Optional)</label>
+            <textarea
+              value={newProject.description}
+              onChange={(e) => setNewProject(prev => ({ ...prev, description: e.target.value }))}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Brief description of your video content..."
+            />
+          </div>
+          
+          {/* Template Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">Video Template</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {templates.map((template) => (
+                <div
+                  key={template.id}
+                  onClick={() => setNewProject(prev => ({ ...prev, template: template.id }))}
+                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    newProject.template === template.id
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-start space-x-3">
+                    <span className="text-2xl">{template.icon}</span>
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900">{template.name}</h4>
+                      <p className="text-sm text-gray-500 mt-1">{template.description}</p>
+                      <p className="text-xs text-gray-400 mt-2">Duration: {template.duration}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Voice Persona */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">Voice Persona</label>
+            <div className="space-y-2">
+              {voicePersonas.map((persona) => (
+                <label key={persona.id} className="flex items-center">
+                  <input
+                    type="radio"
+                    name="voice_persona"
+                    value={persona.id}
+                    checked={newProject.voice_persona === persona.id}
+                    onChange={(e) => setNewProject(prev => ({ ...prev, voice_persona: e.target.value }))}
+                    className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  />
+                  <div className="ml-3">
+                    <span className="text-sm font-medium text-gray-900">{persona.name}</span>
+                    <span className="text-sm text-gray-500 ml-2">{persona.description}</span>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+          
+          {/* Create Button */}
+          <div className="pt-4">
+            <button
+              onClick={handleCreateVideo}
+              disabled={!newProject.title || creatingVideo}
+              className="w-full flex items-center justify-center px-4 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {creatingVideo ? (
+                <>
+                  <Clock className="w-4 h-4 mr-2 animate-spin" />
+                  Creating Video...
+                </>
+              ) : (
+                <>
+                  <Video className="w-4 h-4 mr-2" />
+                  Create Professional Video
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const Projects = () => (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-gray-900">All Projects</h2>
+        <button
+          onClick={() => setActiveView('create')}
+          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          <Video className="w-4 h-4 mr-2" />
+          New Video
+        </button>
+      </div>
+      
+      <div className="bg-white rounded-lg shadow">
+        <div className="p-6">
+          <div className="space-y-4">
+            {projects.map((project) => (
+              <div key={project.project_id} className="flex items-center justify-between p-6 border border-gray-200 rounded-lg">
+                <div className="flex-1">
+                  <h4 className="text-lg font-medium text-gray-900">{project.title}</h4>
+                  <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                    <span>Created: {new Date(project.created_at).toLocaleDateString()}</span>
+                    <span>Template: {templates.find(t => t.id === project.template)?.name}</span>
+                    <span>Voice: {voicePersonas.find(v => v.id === project.voice_persona)?.name}</span>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <StatusBadge status={project.status} />
+                  {project.status === 'completed' && (
+                    <div className="flex space-x-2">
+                      <button className="flex items-center px-3 py-1 text-blue-600 hover:text-blue-800">
+                        <Play className="w-4 h-4 mr-1" />
+                        Preview
+                      </button>
+                      <button className="flex items-center px-3 py-1 text-green-600 hover:text-green-800">
+                        <Download className="w-4 h-4 mr-1" />
+                        Download
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const Navigation = () => (
+    <nav className="bg-white shadow-sm border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
+            <div className="flex-shrink-0 flex items-center">
+              <Sparkles className="w-8 h-8 text-blue-600 mr-2" />
+              <span className="text-xl font-bold text-gray-900">Rudh AI Video Studio</span>
+            </div>
+            <div className="ml-10 flex space-x-8">
+              <button
+                onClick={() => setActiveView('dashboard')}
+                className={`px-3 py-2 text-sm font-medium ${
+                  activeView === 'dashboard'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Dashboard
+              </button>
+              <button
+                onClick={() => setActiveView('create')}
+                className={`px-3 py-2 text-sm font-medium ${
+                  activeView === 'create'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Create Video
+              </button>
+              <button
+                onClick={() => setActiveView('projects')}
+                className={`px-3 py-2 text-sm font-medium ${
+                  activeView === 'projects'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                All Projects
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="text-sm text-gray-500">
+              <span className="font-medium">{userSubscription?.plan}</span> Plan
+            </div>
+            <div className="flex items-center space-x-2">
+              <Users className="w-4 h-4 text-gray-400" />
+              <span className="text-sm text-gray-600">Chennai User</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      
+      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {activeView === 'dashboard' && <Dashboard />}
+        {activeView === 'create' && <CreateVideo />}
+        {activeView === 'projects' && <Projects />}
+      </main>
+      
+      {/* Footer */}
+      <footer className="bg-white border-t mt-12">
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <Sparkles className="w-5 h-5 text-blue-600" />
+              <span className="text-sm text-gray-600">
+                Powered by Rudh AI • Professional Video Creation for Chennai Businesses
+              </span>
+            </div>
+            <div className="text-sm text-gray-500">
+              🇮🇳 Made in Chennai with AI & Voice Technology
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default RudhVideoStudio;
